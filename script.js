@@ -249,11 +249,56 @@ function calculateShipping(cartTotalINR, countryCode, pincode) {
     };
 }
 
-// Load Products from CSV
+// Google Sheets Configuration
+const GOOGLE_SHEET_ID = '1guWacKQNtAzqFiyKWySN6CO_qLDK0wh57b2ALhg5GTY';
+const GOOGLE_SHEET_URL = 'https://docs.google.com/spreadsheets/d/' + GOOGLE_SHEET_ID + '/gviz/tq?tqx=out:csv';
+
+// Convert Google Drive URL to direct image URL
+function getDirectImageUrl(imageUrl) {
+    if (!imageUrl) return 'images/placeholder.jpg';
+    
+    var cleanUrl = imageUrl.trim();
+    
+    // If not a URL, return as-is (local file)
+    if (!cleanUrl.startsWith('http')) {
+        return 'images/' + cleanUrl;
+    }
+    
+    // Convert Google Drive sharing URLs to direct image URLs
+    if (cleanUrl.includes('drive.google.com')) {
+        var fileId = null;
+        
+        // Extract file ID from various formats
+        var patterns = [
+            /\/file\/d\/([a-zA-Z0-9_-]+)/,      // /file/d/ID/view
+            /id=([a-zA-Z0-9_-]+)/,               // ?id=ID or &id=ID
+            /\/d\/([a-zA-Z0-9_-]+)/,             // /d/ID
+            /open\?id=([a-zA-Z0-9_-]+)/          // open?id=ID
+        ];
+        
+        for (var i = 0; i < patterns.length; i++) {
+            var match = cleanUrl.match(patterns[i]);
+            if (match) {
+                fileId = match[1];
+                break;
+            }
+        }
+        
+        if (fileId) {
+            // Use lh3.googleusercontent.com for reliable image loading
+            return 'https://lh3.googleusercontent.com/d/' + fileId + '=w500';
+        }
+    }
+    
+    // Return original URL for non-Google Drive URLs
+    return cleanUrl;
+}
+
+// Load Products from Google Sheets
 function loadProductsFromCSV() {
-    fetch('products.csv')
+    fetch(GOOGLE_SHEET_URL)
         .then(function(response) {
-            if (!response.ok) throw new Error('Could not load products.csv');
+            if (!response.ok) throw new Error('Could not load Google Sheet');
             return response.text();
         })
         .then(function(csvText) {
@@ -262,29 +307,58 @@ function loadProductsFromCSV() {
             updateCart();
         })
         .catch(function(error) {
-            console.error('Error loading products:', error);
-            productsGrid.innerHTML = '<div class="loading"><p>Error loading products. Please refresh.</p></div>';
+            console.error('Error loading products from Google Sheets:', error);
+            // Fallback to local CSV
+            fetch('products.csv')
+                .then(function(response) { return response.text(); })
+                .then(function(csvText) {
+                    products = parseCSV(csvText);
+                    renderProducts('all');
+                    updateCart();
+                })
+                .catch(function(err) {
+                    productsGrid.innerHTML = '<div class="loading"><p>Error loading products. Please refresh.</p></div>';
+                });
         });
 }
 
-// Parse CSV
+// Parse CSV (handles Google Sheets format)
 function parseCSV(csvText) {
     var lines = csvText.trim().split('\n');
     var result = [];
     for (var i = 1; i < lines.length; i++) {
         var values = parseCSVLine(lines[i]);
         if (values.length >= 5 && values[0].trim()) {
-            result.push({
-                id: i,
-                name: values[0].trim(),
-                image: 'images/' + values[1].trim(),
-                price: parseInt(values[2], 10),
-                description: values[3].trim(),
-                category: values[4].trim(),
-                badge: values[5] ? values[5].trim() : null
-            });
+            // Clean up values (remove extra quotes from Google Sheets)
+            var cleanValue = function(val) {
+                if (!val) return '';
+                return val.replace(/^"|"$/g, '').replace(/""/g, '"').trim();
+            };
+            
+            var name = cleanValue(values[0]);
+            var imageUrl = cleanValue(values[1]);
+            var price = parseInt(cleanValue(values[2]), 10) || 0;
+            var description = cleanValue(values[3]);
+            var category = cleanValue(values[4]).toLowerCase();
+            var badge = values[5] ? cleanValue(values[5]) : null;
+            
+            // Convert to direct image URL
+            var directImageUrl = getDirectImageUrl(imageUrl);
+            
+            if (name && price > 0) {
+                result.push({
+                    id: i,
+                    name: name,
+                    image: directImageUrl,
+                    price: price,
+                    description: description,
+                    category: category,
+                    badge: badge
+                });
+            }
         }
     }
+    console.log('Loaded ' + result.length + ' products from spreadsheet');
     return result;
 }
 
@@ -371,7 +445,7 @@ function renderProducts(filter) {
         return '<div class="product-card"><div class="product-image">' +
             (p.badge ? '<span class="product-badge">' + p.badge + '</span>' : '') +
             '<button class="product-wishlist"><svg viewBox="0 0 24 24" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg></button>' +
-            '<img src="' + p.image + '" alt="' + p.name + '" loading="lazy"></div>' +
+            '<img src="' + p.image + '" alt="' + p.name + '" loading="lazy" onerror="handleImageError(this)"></div>' +
             '<div class="product-info"><div class="product-category">' + p.category + '</div>' +
             '<h3 class="product-title">' + p.name + '</h3>' +
             '<p class="product-description">' + p.description + '</p>' +
@@ -379,6 +453,31 @@ function renderProducts(filter) {
             '<button class="add-to-cart" onclick="addToCart(' + p.id + ')">' +
             '<svg viewBox="0 0 24 24" fill="none" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg></button></div></div></div>';
     }).join('');
+}
+
+// Handle image loading errors
+function handleImageError(img) {
+    var currentSrc = img.src;
+    console.log('Image failed to load:', currentSrc);
+    
+    // Try alternate Google Drive URL format
+    if (currentSrc.includes('lh3.googleusercontent.com')) {
+        var fileId = currentSrc.match(/\/d\/([a-zA-Z0-9_-]+)/);
+        if (fileId) {
+            img.src = 'https://drive.google.com/thumbnail?id=' + fileId[1] + '&sz=w500';
+            return;
+        }
+    } else if (currentSrc.includes('drive.google.com/thumbnail')) {
+        var fileId = currentSrc.match(/id=([a-zA-Z0-9_-]+)/);
+        if (fileId) {
+            img.src = 'https://drive.google.com/uc?export=view&id=' + fileId[1];
+            return;
+        }
+    }
+    
+    // Show placeholder
+    img.onerror = null;
+    img.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="300" height="300" viewBox="0 0 300 300"%3E%3Crect fill="%23C8D9B3" width="300" height="300"/%3E%3Ctext fill="%232D5016" font-family="Arial" font-size="14" x="50%25" y="50%25" text-anchor="middle"%3EImage not available%3C/text%3E%3C/svg%3E';
 }
 
 // Cart Functions
