@@ -1,0 +1,3 @@
+- Reads the list from https://docs.google.com/spreadsheets/d/1guWacKQNtAzqFiyKWySN6CO_qLDK0wh57b2ALhg5GTY/edit?gid=54715883#gid=54715883
+- Image file name is first checked in the images folder then in the google drive folder.
+- if image is stored in Google Drive, used file id of the image.
