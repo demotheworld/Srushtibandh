@@ -637,8 +637,82 @@ function openCheckout() {
         '<div class="order-total"><span>Total</span><span id="grandTotal">' + formatPrice(grandTotalINR) + '</span></div>' +
         '</div></div>' +
         
+        // Payment Method Section
+        '<div class="checkout-section">' +
+        '<h4>Payment Method</h4>' +
+        '<div class="payment-methods">' +
+        '<label class="payment-option">' +
+        '<input type="radio" name="paymentMethod" value="upi" checked>' +
+        '<div class="payment-option-content">' +
+        '<div class="payment-option-header">' +
+        '<span class="payment-icon">📱</span>' +
+        '<span class="payment-name">UPI</span>' +
+        '<span class="payment-badge">Popular in India</span>' +
+        '</div>' +
+        '<span class="payment-desc">Pay using Google Pay, PhonePe, Paytm, or any UPI app</span>' +
+        '</div>' +
+        '</label>' +
+        '<label class="payment-option">' +
+        '<input type="radio" name="paymentMethod" value="card">' +
+        '<div class="payment-option-content">' +
+        '<div class="payment-option-header">' +
+        '<span class="payment-icon">💳</span>' +
+        '<span class="payment-name">Credit / Debit Card</span>' +
+        '</div>' +
+        '<span class="payment-desc">Visa, Mastercard, RuPay, American Express</span>' +
+        '</div>' +
+        '</label>' +
+        '</div>' +
+        
+        // UPI Payment Details
+        '<div class="payment-details" id="upiDetails">' +
+        '<div class="form-group">' +
+        '<label>UPI ID *</label>' +
+        '<input type="text" id="upiId" placeholder="yourname@upi / mobile@paytm" pattern="[a-zA-Z0-9.\\-_]+@[a-zA-Z]+" title="Enter valid UPI ID (e.g., name@upi)">' +
+        '</div>' +
+        '<div class="upi-apps">' +
+        '<span>Or pay using:</span>' +
+        '<div class="upi-app-icons">' +
+        '<button type="button" class="upi-app-btn" data-app="gpay" title="Google Pay">GPay</button>' +
+        '<button type="button" class="upi-app-btn" data-app="phonepe" title="PhonePe">PhonePe</button>' +
+        '<button type="button" class="upi-app-btn" data-app="paytm" title="Paytm">Paytm</button>' +
+        '<button type="button" class="upi-app-btn" data-app="bhim" title="BHIM">BHIM</button>' +
+        '</div>' +
+        '</div>' +
+        '</div>' +
+        
+        // Card Payment Details
+        '<div class="payment-details" id="cardDetails" style="display:none;">' +
+        '<div class="form-group">' +
+        '<label>Card Number *</label>' +
+        '<input type="text" id="cardNumber" placeholder="1234 5678 9012 3456" maxlength="19">' +
+        '</div>' +
+        '<div class="form-row">' +
+        '<div class="form-group">' +
+        '<label>Expiry Date *</label>' +
+        '<input type="text" id="cardExpiry" placeholder="MM/YY" maxlength="5">' +
+        '</div>' +
+        '<div class="form-group">' +
+        '<label>CVV *</label>' +
+        '<input type="password" id="cardCvv" placeholder="•••" maxlength="4">' +
+        '</div>' +
+        '</div>' +
+        '<div class="form-group">' +
+        '<label>Name on Card *</label>' +
+        '<input type="text" id="cardName" placeholder="As printed on card">' +
+        '</div>' +
+        '<div class="card-icons">' +
+        '<span class="card-icon" title="Visa">VISA</span>' +
+        '<span class="card-icon" title="Mastercard">MC</span>' +
+        '<span class="card-icon" title="RuPay">RuPay</span>' +
+        '<span class="card-icon" title="Amex">AMEX</span>' +
+        '</div>' +
+        '</div>' +
+        '</div>' +
+        
         '<div class="shipping-origin">📍 Ships from: Lawada, Duni, Dharani, Amravati, India - 444702</div>' +
-        '<button type="submit" class="place-order-btn" id="placeOrderBtn">Place Order - ' + formatPrice(grandTotalINR) + '</button>' +
+        '<div class="secure-payment"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg> Secure Payment - 256-bit SSL Encryption</div>' +
+        '<button type="submit" class="place-order-btn" id="placeOrderBtn">Pay ' + formatPrice(grandTotalINR) + '</button>' +
         '</form>';
     
     checkoutModal.classList.add('active');
@@ -647,6 +721,101 @@ function openCheckout() {
     document.getElementById('checkoutForm').onsubmit = handleCheckout;
     document.getElementById('custCountry').onchange = updateShippingOnCountryChange;
     document.getElementById('custZip').onblur = updateShippingWithPincode;
+    
+    // Payment method toggle
+    var paymentRadios = document.querySelectorAll('input[name="paymentMethod"]');
+    paymentRadios.forEach(function(radio) {
+        radio.addEventListener('change', function() {
+            togglePaymentDetails(this.value);
+        });
+    });
+    
+    // UPI app buttons
+    var upiAppBtns = document.querySelectorAll('.upi-app-btn');
+    upiAppBtns.forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            handleUpiAppClick(this.dataset.app);
+        });
+    });
+    
+    // Card number formatting
+    var cardNumberInput = document.getElementById('cardNumber');
+    if (cardNumberInput) {
+        cardNumberInput.addEventListener('input', function() {
+            var value = this.value.replace(/\s/g, '').replace(/\D/g, '');
+            var formatted = value.match(/.{1,4}/g);
+            this.value = formatted ? formatted.join(' ') : '';
+        });
+    }
+    
+    // Expiry date formatting
+    var cardExpiryInput = document.getElementById('cardExpiry');
+    if (cardExpiryInput) {
+        cardExpiryInput.addEventListener('input', function() {
+            var value = this.value.replace(/\D/g, '');
+            if (value.length >= 2) {
+                this.value = value.substring(0, 2) + '/' + value.substring(2, 4);
+            } else {
+                this.value = value;
+            }
+        });
+    }
+}
+
+// Toggle payment details visibility
+function togglePaymentDetails(method) {
+    var upiDetails = document.getElementById('upiDetails');
+    var cardDetails = document.getElementById('cardDetails');
+    
+    if (method === 'upi') {
+        upiDetails.style.display = 'block';
+        cardDetails.style.display = 'none';
+        document.getElementById('upiId').setAttribute('required', '');
+        document.getElementById('cardNumber').removeAttribute('required');
+        document.getElementById('cardExpiry').removeAttribute('required');
+        document.getElementById('cardCvv').removeAttribute('required');
+        document.getElementById('cardName').removeAttribute('required');
+    } else {
+        upiDetails.style.display = 'none';
+        cardDetails.style.display = 'block';
+        document.getElementById('upiId').removeAttribute('required');
+        document.getElementById('cardNumber').setAttribute('required', '');
+        document.getElementById('cardExpiry').setAttribute('required', '');
+        document.getElementById('cardCvv').setAttribute('required', '');
+        document.getElementById('cardName').setAttribute('required', '');
+    }
+}
+
+// Handle UPI app button click
+function handleUpiAppClick(app) {
+    var totalPriceINR = cart.reduce(function(s, i) { return s + i.price * i.quantity; }, 0);
+    var shipping = calculateShipping(totalPriceINR, userCountry);
+    var grandTotal = totalPriceINR + shipping.costINR;
+    
+    // UPI payment link format
+    var upiId = 'srushtibandh@upi'; // Replace with actual UPI ID
+    var merchantName = 'Srushtibandh';
+    var transactionNote = 'Order from Srushtibandh';
+    
+    var upiUrl = 'upi://pay?pa=' + upiId + 
+                 '&pn=' + encodeURIComponent(merchantName) + 
+                 '&am=' + grandTotal + 
+                 '&cu=INR' + 
+                 '&tn=' + encodeURIComponent(transactionNote);
+    
+    // App-specific deep links
+    var appUrls = {
+        'gpay': 'tez://upi/pay?pa=' + upiId + '&pn=' + encodeURIComponent(merchantName) + '&am=' + grandTotal + '&cu=INR&tn=' + encodeURIComponent(transactionNote),
+        'phonepe': 'phonepe://pay?pa=' + upiId + '&pn=' + encodeURIComponent(merchantName) + '&am=' + grandTotal + '&cu=INR&tn=' + encodeURIComponent(transactionNote),
+        'paytm': 'paytmmp://pay?pa=' + upiId + '&pn=' + encodeURIComponent(merchantName) + '&am=' + grandTotal + '&cu=INR&tn=' + encodeURIComponent(transactionNote),
+        'bhim': upiUrl
+    };
+    
+    // Try to open the app
+    window.location.href = appUrls[app] || upiUrl;
+    
+    // Show toast
+    showToast('Opening ' + app.charAt(0).toUpperCase() + app.slice(1) + '...');
 }
 
 function getCountryName(code) {
@@ -726,21 +895,51 @@ function handleCheckout(e) {
     var zip = document.getElementById('custZip').value;
     var country = document.getElementById('custCountry').value;
     
+    // Get payment method
+    var paymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
+    var paymentInfo = '';
+    
+    if (paymentMethod === 'upi') {
+        var upiId = document.getElementById('upiId').value;
+        if (!upiId) {
+            showToast('Please enter your UPI ID');
+            return;
+        }
+        paymentInfo = 'UPI: ' + upiId;
+    } else {
+        var cardNumber = document.getElementById('cardNumber').value;
+        var cardExpiry = document.getElementById('cardExpiry').value;
+        var cardCvv = document.getElementById('cardCvv').value;
+        var cardName = document.getElementById('cardName').value;
+        
+        if (!cardNumber || !cardExpiry || !cardCvv || !cardName) {
+            showToast('Please fill all card details');
+            return;
+        }
+        paymentInfo = 'Card ending in ' + cardNumber.slice(-4);
+    }
+    
     var fullPhone = phoneCode + ' ' + phone;
     
     var btn = document.getElementById('placeOrderBtn');
     btn.disabled = true;
-    btn.textContent = 'Processing...';
+    btn.textContent = 'Processing Payment...';
     
     setTimeout(function() {
         var orderNum = 'SBK' + Date.now().toString().slice(-6);
+        var totalPriceINR = cart.reduce(function(s, i) { return s + i.price * i.quantity; }, 0);
+        var shipping = calculateShipping(totalPriceINR, country);
+        var grandTotalINR = totalPriceINR + shipping.costINR;
+        
         document.getElementById('checkoutBody').innerHTML = 
             '<div class="success-message">' +
             '<div class="success-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg></div>' +
-            '<h3>Order Placed Successfully!</h3>' +
+            '<h3>Payment Successful!</h3>' +
             '<p>Thank you for supporting Melghat artisans, ' + name.split(' ')[0] + '!</p>' +
             '<div class="order-confirmation">' +
             '<p><strong>Order #' + orderNum + '</strong></p>' +
+            '<p>💰 Amount Paid: ' + formatPrice(grandTotalINR) + '</p>' +
+            '<p>💳 Payment Method: ' + paymentInfo + '</p>' +
             '<p>📧 Confirmation sent to: ' + email + '</p>' +
             '<p>📱 Phone: ' + fullPhone + '</p>' +
             '<p>📦 Shipping to:<br>' + address + '<br>' + city + ', ' + state + ' ' + zip + '<br>' + getCountryName(country) + '</p>' +
@@ -752,7 +951,7 @@ function handleCheckout(e) {
             '</div>' +
             '<button class="btn btn-primary" onclick="closeCheckout(); cart=[]; updateCart();">Continue Shopping</button>' +
             '</div>';
-    }, 2000);
+    }, 2500);
 }
 
 function showToast(msg) {

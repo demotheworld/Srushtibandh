@@ -333,6 +333,38 @@ h1, h2, h3, h4, h5, h6 { font-family: 'Cormorant Garamond', serif; font-weight: 
 .contact-link { display: block; color: var(--bamboo-green); text-decoration: none; font-size: 0.9rem; margin: 0.3rem 0; }
 .contact-link:hover { text-decoration: underline; }
 
+/* Payment Methods */
+.payment-methods { display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 1rem; }
+.payment-option { display: flex; align-items: flex-start; gap: 0.75rem; padding: 1rem; border: 2px solid var(--bamboo-pale); border-radius: 12px; cursor: pointer; transition: all 0.3s; }
+.payment-option:hover { border-color: var(--bamboo-light); background: var(--bg-tertiary); }
+.payment-option input[type="radio"] { margin-top: 0.25rem; accent-color: var(--bamboo-green); width: 18px; height: 18px; }
+.payment-option input[type="radio"]:checked + .payment-option-content { color: var(--forest); }
+.payment-option:has(input:checked) { border-color: var(--bamboo-green); background: var(--bamboo-pale); }
+.payment-option-content { flex: 1; }
+.payment-option-header { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem; flex-wrap: wrap; }
+.payment-icon { font-size: 1.25rem; }
+.payment-name { font-weight: 600; font-size: 1rem; color: var(--text-primary); }
+.payment-badge { background: var(--bamboo-green); color: #fff; font-size: 0.65rem; padding: 0.15rem 0.5rem; border-radius: 20px; font-weight: 500; }
+.payment-desc { font-size: 0.8rem; color: var(--text-light); }
+
+/* Payment Details */
+.payment-details { background: var(--bg-tertiary); padding: 1rem; border-radius: 10px; margin-top: 0.5rem; }
+
+/* UPI Section */
+.upi-apps { margin-top: 1rem; }
+.upi-apps > span { font-size: 0.85rem; color: var(--text-light); display: block; margin-bottom: 0.5rem; }
+.upi-app-icons { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+.upi-app-btn { padding: 0.5rem 1rem; border: 2px solid var(--bamboo-pale); background: var(--bg-secondary); border-radius: 8px; font-size: 0.8rem; font-weight: 600; color: var(--text-primary); cursor: pointer; transition: all 0.3s; }
+.upi-app-btn:hover { border-color: var(--bamboo-green); background: var(--bamboo-pale); }
+
+/* Card Section */
+.card-icons { display: flex; gap: 0.5rem; margin-top: 0.75rem; justify-content: center; }
+.card-icon { padding: 0.25rem 0.5rem; background: var(--bg-secondary); border: 1px solid var(--bamboo-pale); border-radius: 4px; font-size: 0.7rem; font-weight: 700; color: var(--text-light); }
+
+/* Secure Payment Badge */
+.secure-payment { display: flex; align-items: center; justify-content: center; gap: 0.5rem; font-size: 0.8rem; color: var(--bamboo-green); margin: 1rem 0; padding: 0.5rem; background: var(--bamboo-pale); border-radius: 8px; }
+.secure-payment svg { width: 16px; height: 16px; }
+
 /* Toast */
 .toast { position: fixed; bottom: 2rem; right: 2rem; background: var(--forest); color: #fff; padding: 1rem 1.5rem; border-radius: 10px; display: flex; align-items: center; gap: 0.8rem; transform: translateX(150%); transition: 0.4s; z-index: 4000; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2); }
 .toast.show { transform: translateX(0); }
