@@ -343,7 +343,7 @@ h1, h2, h3, h4, h5, h6 { font-family: 'Cormorant Garamond', serif; font-weight: 
 .payment-option-content { flex: 1; }
 .payment-option-header { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem; flex-wrap: wrap; }
 .payment-icon { font-size: 1.25rem; }
-.payment-name { font-weight: 600; font-size: 1rem; color: var(--text-primary); }
+.payment-name { font-weight: 600; font-size: 1rem; color: var(--text-dark); }
 .payment-badge { background: var(--bamboo-green); color: #fff; font-size: 0.65rem; padding: 0.15rem 0.5rem; border-radius: 20px; font-weight: 500; }
 .payment-desc { font-size: 0.8rem; color: var(--text-light); }
 
@@ -351,11 +351,34 @@ h1, h2, h3, h4, h5, h6 { font-family: 'Cormorant Garamond', serif; font-weight: 
 .payment-details { background: var(--bg-tertiary); padding: 1rem; border-radius: 10px; margin-top: 0.5rem; }
 
 /* UPI Section */
-.upi-apps { margin-top: 1rem; }
+.upi-payment-info { display: flex; gap: 1rem; margin-bottom: 1rem; flex-wrap: wrap; }
+.upi-merchant { flex: 1; min-width: 200px; background: var(--bg-secondary); padding: 1rem; border-radius: 10px; border-left: 4px solid var(--bamboo-green); }
+.merchant-label { font-size: 0.75rem; color: var(--text-light); margin-bottom: 0.25rem; }
+.merchant-name { font-size: 1rem; font-weight: 700; color: var(--forest); margin-bottom: 0.25rem; }
+.merchant-upi { font-size: 0.9rem; color: var(--text-dark); margin-bottom: 0.25rem; }
+.merchant-upi strong { color: var(--bamboo-green); }
+.merchant-bank { font-size: 0.8rem; color: var(--text-light); }
+.upi-amount-display { flex: 0 0 auto; background: linear-gradient(135deg, var(--bamboo-green), var(--forest)); padding: 1rem 1.5rem; border-radius: 10px; text-align: center; color: #fff; display: flex; flex-direction: column; justify-content: center; }
+.upi-amount-display p:first-child { font-size: 0.8rem; opacity: 0.9; margin-bottom: 0.25rem; }
+.upi-total { font-size: 1.75rem; font-weight: 700; }
+.upi-hint { font-size: 0.75rem; color: var(--text-light); margin-top: 0.25rem; }
+
+/* UPI App Buttons - Mobile Only */
+.upi-apps { margin-top: 1rem; display: none; }
 .upi-apps > span { font-size: 0.85rem; color: var(--text-light); display: block; margin-bottom: 0.5rem; }
 .upi-app-icons { display: flex; gap: 0.5rem; flex-wrap: wrap; }
-.upi-app-btn { padding: 0.5rem 1rem; border: 2px solid var(--bamboo-pale); background: var(--bg-secondary); border-radius: 8px; font-size: 0.8rem; font-weight: 600; color: var(--text-primary); cursor: pointer; transition: all 0.3s; }
+.upi-app-btn { padding: 0.5rem 1rem; border: 2px solid var(--bamboo-pale); background: var(--bg-secondary); border-radius: 8px; font-size: 0.8rem; font-weight: 600; color: var(--text-dark); cursor: pointer; transition: all 0.3s; }
 .upi-app-btn:hover { border-color: var(--bamboo-green); background: var(--bamboo-pale); }
+
+/* Show UPI app buttons only on mobile devices */
+@media (max-width: 768px) {
+    .upi-apps.mobile-only { display: block; }
+}
+
+@media (max-width: 480px) {
+    .upi-payment-info { flex-direction: column; }
+    .upi-amount-display { width: 100%; }
+}
 
 /* Card Section */
 .card-icons { display: flex; gap: 0.5rem; margin-top: 0.75rem; justify-content: center; }

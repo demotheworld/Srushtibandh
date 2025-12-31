@@ -642,7 +642,17 @@ function openCheckout() {
         '<h4>Payment Method</h4>' +
         '<div class="payment-methods">' +
         '<label class="payment-option">' +
-        '<input type="radio" name="paymentMethod" value="upi" checked>' +
+        '<input type="radio" name="paymentMethod" value="card" checked>' +
+        '<div class="payment-option-content">' +
+        '<div class="payment-option-header">' +
+        '<span class="payment-icon">💳</span>' +
+        '<span class="payment-name">Credit / Debit Card</span>' +
+        '</div>' +
+        '<span class="payment-desc">Visa, Mastercard, RuPay, American Express</span>' +
+        '</div>' +
+        '</label>' +
+        '<label class="payment-option">' +
+        '<input type="radio" name="paymentMethod" value="upi">' +
         '<div class="payment-option-content">' +
         '<div class="payment-option-header">' +
         '<span class="payment-icon">📱</span>' +
@@ -652,60 +662,63 @@ function openCheckout() {
         '<span class="payment-desc">Pay using Google Pay, PhonePe, Paytm, or any UPI app</span>' +
         '</div>' +
         '</label>' +
-        '<label class="payment-option">' +
-        '<input type="radio" name="paymentMethod" value="card">' +
-        '<div class="payment-option-content">' +
-        '<div class="payment-option-header">' +
-        '<span class="payment-icon">💳</span>' +
-        '<span class="payment-name">Credit / Debit Card</span>' +
-        '</div>' +
-        '<span class="payment-desc">Visa, Mastercard, RuPay, American Express</span>' +
-        '</div>' +
-        '</label>' +
         '</div>' +
         
-        // UPI Payment Details
-        '<div class="payment-details" id="upiDetails">' +
-        '<div class="form-group">' +
-        '<label>UPI ID *</label>' +
-        '<input type="text" id="upiId" placeholder="yourname@upi / mobile@paytm" pattern="[a-zA-Z0-9.\\-_]+@[a-zA-Z]+" title="Enter valid UPI ID (e.g., name@upi)">' +
-        '</div>' +
-        '<div class="upi-apps">' +
-        '<span>Or pay using:</span>' +
-        '<div class="upi-app-icons">' +
-        '<button type="button" class="upi-app-btn" data-app="gpay" title="Google Pay">GPay</button>' +
-        '<button type="button" class="upi-app-btn" data-app="phonepe" title="PhonePe">PhonePe</button>' +
-        '<button type="button" class="upi-app-btn" data-app="paytm" title="Paytm">Paytm</button>' +
-        '<button type="button" class="upi-app-btn" data-app="bhim" title="BHIM">BHIM</button>' +
-        '</div>' +
-        '</div>' +
-        '</div>' +
-        
-        // Card Payment Details
-        '<div class="payment-details" id="cardDetails" style="display:none;">' +
+        // Card Payment Details (shown by default now)
+        '<div class="payment-details" id="cardDetails">' +
         '<div class="form-group">' +
         '<label>Card Number *</label>' +
-        '<input type="text" id="cardNumber" placeholder="1234 5678 9012 3456" maxlength="19">' +
+        '<input type="text" id="cardNumber" placeholder="1234 5678 9012 3456" maxlength="19" required>' +
         '</div>' +
         '<div class="form-row">' +
         '<div class="form-group">' +
         '<label>Expiry Date *</label>' +
-        '<input type="text" id="cardExpiry" placeholder="MM/YY" maxlength="5">' +
+        '<input type="text" id="cardExpiry" placeholder="MM/YY" maxlength="5" required>' +
         '</div>' +
         '<div class="form-group">' +
         '<label>CVV *</label>' +
-        '<input type="password" id="cardCvv" placeholder="•••" maxlength="4">' +
+        '<input type="password" id="cardCvv" placeholder="•••" maxlength="4" required>' +
         '</div>' +
         '</div>' +
         '<div class="form-group">' +
         '<label>Name on Card *</label>' +
-        '<input type="text" id="cardName" placeholder="As printed on card">' +
+        '<input type="text" id="cardName" placeholder="As printed on card" required>' +
         '</div>' +
         '<div class="card-icons">' +
         '<span class="card-icon" title="Visa">VISA</span>' +
         '<span class="card-icon" title="Mastercard">MC</span>' +
         '<span class="card-icon" title="RuPay">RuPay</span>' +
         '<span class="card-icon" title="Amex">AMEX</span>' +
+        '</div>' +
+        '</div>' +
+        
+        // UPI Payment Details (hidden by default now)
+        '<div class="payment-details" id="upiDetails" style="display:none;">' +
+        '<div class="upi-payment-info">' +
+        '<div class="upi-merchant">' +
+        '<p class="merchant-label">Pay to:</p>' +
+        '<p class="merchant-name">VENU SHILPI AUDYOGIK</p>' +
+        '<p class="merchant-upi"><strong>UPI ID:</strong> VASS@mahb</p>' +
+        '<p class="merchant-bank">Bank of Maharashtra</p>' +
+        '</div>' +
+        '<div class="upi-amount-display">' +
+        '<p>Amount to Pay:</p>' +
+        '<p class="upi-total" id="upiTotalAmount">₹' + grandTotalINR.toLocaleString('en-IN') + '</p>' +
+        '</div>' +
+        '</div>' +
+        '<div class="form-group">' +
+        '<label>Your UPI ID *</label>' +
+        '<input type="text" id="upiId" placeholder="yourname@upi / mobile@paytm" pattern="[a-zA-Z0-9.\\-_]+@[a-zA-Z]+">' +
+        '<p class="upi-hint">We will send a payment request to this UPI ID</p>' +
+        '</div>' +
+        '<div class="upi-apps mobile-only">' +
+        '<span>Or pay directly using:</span>' +
+        '<div class="upi-app-icons">' +
+        '<button type="button" class="upi-app-btn" data-app="gpay" title="Google Pay">GPay</button>' +
+        '<button type="button" class="upi-app-btn" data-app="phonepe" title="PhonePe">PhonePe</button>' +
+        '<button type="button" class="upi-app-btn" data-app="paytm" title="Paytm">Paytm</button>' +
+        '<button type="button" class="upi-app-btn" data-app="bhim" title="BHIM">BHIM</button>' +
+        '</div>' +
         '</div>' +
         '</div>' +
         '</div>' +
@@ -730,7 +743,7 @@ function openCheckout() {
         });
     });
     
-    // UPI app buttons
+    // UPI app buttons (mobile only)
     var upiAppBtns = document.querySelectorAll('.upi-app-btn');
     upiAppBtns.forEach(function(btn) {
         btn.addEventListener('click', function() {
@@ -786,15 +799,15 @@ function togglePaymentDetails(method) {
     }
 }
 
-// Handle UPI app button click
+// Handle UPI app button click (mobile only)
 function handleUpiAppClick(app) {
     var totalPriceINR = cart.reduce(function(s, i) { return s + i.price * i.quantity; }, 0);
     var shipping = calculateShipping(totalPriceINR, userCountry);
     var grandTotal = totalPriceINR + shipping.costINR;
     
     // UPI payment link format
-    var upiId = 'srushtibandh@upi'; // Replace with actual UPI ID
-    var merchantName = 'Srushtibandh';
+    var upiId = 'VASS@mahb';
+    var merchantName = 'VENU SHILPI AUDYOGIK';
     var transactionNote = 'Order from Srushtibandh';
     
     var upiUrl = 'upi://pay?pa=' + upiId + 
@@ -866,7 +879,7 @@ function updateShippingOnCountryChange() {
         document.getElementById('shippingCountryName').textContent = getCountryName(country);
         document.getElementById('shippingInfo').innerHTML = '📦 Estimated: ' + shipping.days + '<br>🚚 Carrier: <span id="carrierName">' + shipping.carrier + '</span>' + (shipping.isFree ? '' : '<br>🎁 Free shipping above ' + formatPrice(shipping.freeAbove));
         document.getElementById('grandTotal').textContent = formatPrice(grandTotalINR);
-        document.getElementById('placeOrderBtn').textContent = 'Place Order - ' + formatPrice(grandTotalINR);
+        document.getElementById('placeOrderBtn').textContent = 'Pay ' + formatPrice(grandTotalINR);
     });
 }
 
@@ -911,12 +924,19 @@ function handleCheckout(e) {
         var cardExpiry = document.getElementById('cardExpiry').value;
         var cardCvv = document.getElementById('cardCvv').value;
         var cardName = document.getElementById('cardName').value;
-        
+
         if (!cardNumber || !cardExpiry || !cardCvv || !cardName) {
             showToast('Please fill all card details');
             return;
         }
-        paymentInfo = 'Card ending in ' + cardNumber.slice(-4);
+
+        // Remove spaces and get last 4 digits
+        var cleanCardNumber = cardNumber.replace(/\s/g, '');
+        if (cleanCardNumber.length < 4) {
+            showToast('Invalid card number');
+            return;
+        }
+        paymentInfo = 'Card ending in ' + cleanCardNumber.slice(-4);
     }
     
     var fullPhone = phoneCode + ' ' + phone;
