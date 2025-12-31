@@ -714,10 +714,16 @@ function openCheckout() {
         '<div class="upi-apps mobile-only">' +
         '<span>Or pay directly using:</span>' +
         '<div class="upi-app-icons">' +
-        '<button type="button" class="upi-app-btn" data-app="gpay" title="Google Pay">GPay</button>' +
-        '<button type="button" class="upi-app-btn" data-app="phonepe" title="PhonePe">PhonePe</button>' +
-        '<button type="button" class="upi-app-btn" data-app="paytm" title="Paytm">Paytm</button>' +
-        '<button type="button" class="upi-app-btn" data-app="bhim" title="BHIM">BHIM</button>' +
+        '<button type="button" class="upi-app-btn gpay-btn" data-app="gpay" title="Google Pay">' +
+        '<span class="app-icon">G</span>GPay</button>' +
+        '<button type="button" class="upi-app-btn phonepe-btn" data-app="phonepe" title="PhonePe">' +
+        '<span class="app-icon">℗</span>PhonePe</button>' +
+        '<button type="button" class="upi-app-btn paytm-btn" data-app="paytm" title="Paytm">' +
+        '<span class="app-icon">₱</span>Paytm</button>' +
+        '<button type="button" class="upi-app-btn bhim-btn" data-app="bhim" title="BHIM">' +
+        '<span class="app-icon">B</span>BHIM</button>' +
+        '<button type="button" class="upi-app-btn amazonpay-btn" data-app="amazonpay" title="Amazon Pay">' +
+        '<span class="app-icon">a</span>Amazon Pay</button>' +
         '</div>' +
         '</div>' +
         '</div>' +
@@ -821,14 +827,22 @@ function handleUpiAppClick(app) {
         'gpay': 'tez://upi/pay?pa=' + upiId + '&pn=' + encodeURIComponent(merchantName) + '&am=' + grandTotal + '&cu=INR&tn=' + encodeURIComponent(transactionNote),
         'phonepe': 'phonepe://pay?pa=' + upiId + '&pn=' + encodeURIComponent(merchantName) + '&am=' + grandTotal + '&cu=INR&tn=' + encodeURIComponent(transactionNote),
         'paytm': 'paytmmp://pay?pa=' + upiId + '&pn=' + encodeURIComponent(merchantName) + '&am=' + grandTotal + '&cu=INR&tn=' + encodeURIComponent(transactionNote),
-        'bhim': upiUrl
+        'bhim': upiUrl,
+        'amazonpay': upiUrl  // Amazon Pay uses standard UPI protocol
     };
     
     // Try to open the app
     window.location.href = appUrls[app] || upiUrl;
-    
+
     // Show toast
-    showToast('Opening ' + app.charAt(0).toUpperCase() + app.slice(1) + '...');
+    var appNames = {
+        'gpay': 'Google Pay',
+        'phonepe': 'PhonePe',
+        'paytm': 'Paytm',
+        'bhim': 'BHIM',
+        'amazonpay': 'Amazon Pay'
+    };
+    showToast('Opening ' + (appNames[app] || app) + '...');
 }
 
 function getCountryName(code) {
